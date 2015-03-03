@@ -8,6 +8,7 @@ import edu.cwru.sepia.environment.model.state.State;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +97,7 @@ public class MinimaxAlphaBeta extends Agent {
     {
          ArrayList<GameStateChild> children2=new ArrayList<GameStateChild>();
          children2.addAll(children);
-         children2.sort(new GameStateComparator());
+         Collections.sort(children2, new GameStateComparator());
          return children2;
     }
     
