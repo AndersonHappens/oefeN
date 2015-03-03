@@ -106,7 +106,6 @@ public class MinimaxAlphaBeta extends Agent {
      */
     private class GameStateComparator implements Comparator<GameStateChild>
     {
-
           @Override
           public int compare(GameStateChild state1, GameStateChild state2) {
                double relativeUtility=state1.state.getUtility()-state2.state.getUtility();
@@ -118,6 +117,5 @@ public class MinimaxAlphaBeta extends Agent {
                     return -1;
                }
           }
-         
     }
 }
