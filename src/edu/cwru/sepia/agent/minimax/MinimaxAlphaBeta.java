@@ -7,6 +7,8 @@ import edu.cwru.sepia.environment.model.state.State;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +94,30 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public List<GameStateChild> orderChildrenWithHeuristics(List<GameStateChild> children)
     {
-        return children;
+         ArrayList<GameStateChild> children2=new ArrayList<GameStateChild>();
+         children2.addAll(children);
+         children2.sort(new GameStateComparator());
+         return children2;
+    }
+    
+    /* A comparator for sorting GameStateChild in orderChildrenWithHeuristics
+     * Simply compares the utility (from GameState,getUtility) of state1 and state2.
+     * Returns 1 if state1 has greater utility, 0 if the utilities are equal, -1 if state2 has the greater utility
+     */
+    private class GameStateComparator implements Comparator<GameStateChild>
+    {
+
+          @Override
+          public int compare(GameStateChild state1, GameStateChild state2) {
+               double relativeUtility=state1.state.getUtility()-state2.state.getUtility();
+               if(relativeUtility>0) {
+                    return 1;
+               } else if(relativeUtility==0) {
+                    return 0;
+               } else {
+                    return -1;
+               }
+          }
+         
     }
 }
