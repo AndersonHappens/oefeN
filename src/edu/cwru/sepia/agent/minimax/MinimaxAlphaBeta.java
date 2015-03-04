@@ -76,7 +76,39 @@ public class MinimaxAlphaBeta extends Agent {
      * @return The best child of this node with updated values
      */
     public GameStateChild alphaBetaSearch(GameStateChild node, int depth, double alpha, double beta)
-    {
+    { 
+    	List<GameStateChild> children = orderChildrenWithHeuristics(node.state.getChildren());
+    	if (depth == 0 || children.equals(null) || children.size() == 0) {
+            //return node; unnecessary, happens at end of method
+    	} else if (node.state.isHero()) {
+    		double v = Double.MIN_VALUE;
+    		  for(GameStateChild child: children) {
+    			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
+	              v = Math.max(v, bestNode.state.getUtility());
+	              if (beta <= v) {
+	                  break; // alpha pruning
+	              }
+	              if(alpha < v) {
+	            	  alpha = v;
+	            	  node = bestNode;
+	              }
+
+    		  }
+    	} else {
+	          double v = Double.MAX_VALUE;
+	          for(GameStateChild child: children) {
+    			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
+	              v = Math.min(v, bestNode.state.getUtility());
+	              if (v <= alpha) {
+	                  break; // alpha pruning
+	              }
+	              if(beta > v) {
+	            	  beta = v;
+	            	  node = bestNode;
+	              }
+
+	          }
+    	}
         return node;
     }
 
