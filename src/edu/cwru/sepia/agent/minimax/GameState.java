@@ -24,6 +24,8 @@ import java.util.*;
 public class GameState {
      
      private static final Integer myPlayerNum=new Integer(0);
+     
+     private boolean myTurnNext;
 
      private int xSize;  //map size along x-axis
      private int ySize;  //map size along y-axis
@@ -31,9 +33,11 @@ public class GameState {
      private int[] obstaclesXPositions;
      private int[] obstaclesYPositions;
      
+     private Integer[] enemyUnitIds;
      private int[] enemyUnitXPositions;
      private int[] enemyUnitYPositions;
      
+     private Integer[] friendlyUnitIds;
      private int[] friendlyUnitXPositions;
      private int[] friendlyUnitYPositions;
      
@@ -70,6 +74,7 @@ public class GameState {
               obstaclesYPositions[i]=state.getResourceNode(resourceIds[i]).getYPosition();
          }
          
+         friendlyUnitIds=state.getUnitIds(myPlayerNum).toArray(new Integer[0]);
          List<UnitView> myUnits = state.getUnits(myPlayerNum);             // support for arbitrary amount of friendly units
          friendlyUnitXPositions = new int[myUnits.size()];
          friendlyUnitYPositions = new int[myUnits.size()];
@@ -85,15 +90,19 @@ public class GameState {
                    enemies.add(players[i]);
               }
          }
+         List<Integer> enemyIds=null;
          List<UnitView> enemyUnits=null;
          if(enemies.size()>0) {
+              enemyIds=state.getUnitIds(enemies.get(0));
               enemyUnits = state.getUnits(enemies.get(0));
               if(enemies.size()>1) {
                    for(int i=1;i<enemies.size();i++) {
+                        enemyIds=state.getUnitIds(enemies.get(i));
                         enemyUnits.addAll(state.getUnits(enemies.get(i)));
                    }
               }
          }
+         enemyUnitIds=enemyIds.toArray(new Integer[0]);
          enemyUnitXPositions=new int[0];
          enemyUnitYPositions=new int[0];
          if(enemyUnits!=null) {
@@ -104,9 +113,15 @@ public class GameState {
                    enemyUnitXPositions[i]=enemyUnits.get(i).getYPosition();
               }
          }
+         
+         myTurnNext=true;
     }
 
-    /**
+    private GameState() {
+     // for creating deep copies.
+    }
+
+/**
      * You will implement this function.
      *
      * You should use weighted linear combination of features.
@@ -176,8 +191,41 @@ public class GameState {
      * @return All possible actions and their associated resulting game state
      */
     public List<GameStateChild> getChildren() {
-        return null;
+         ArrayList<GameStateChild> children = new ArrayList<GameStateChild>();
+         children.add(new GameStateChild(new HashMap<Integer, Action>(), this));
+         ArrayList<GameStateChild> newChildren = new ArrayList<GameStateChild>();
+         if(myTurnNext) {
+              //our turn
+              for(int i=0;i<friendlyUnitIds.length;i++) {
+                   while(!children.isEmpty()) {
+                        GameStateChild current=children.remove(0);
+                        for(Direction direction: Direction.values()) {
+                             //newChildren.
+                        }
+                   }
+              }
+         } else {
+              //their turn
+         }
+         return null;
     }
 
-
+    private static GameState copy(GameState state) {
+         GameState copy=new GameState();
+         copy.myTurnNext=state.myTurnNext;
+         copy.xSize=state.xSize;
+         copy.ySize=state.ySize;
+         
+         copy.obstaclesXPositions=Arrays.copyOf(state.obstaclesXPositions, state.obstaclesXPositions.length);
+         copy.obstaclesYPositions=Arrays.copyOf(state.obstaclesYPositions, state.obstaclesYPositions.length);
+         
+         copy.enemyUnitIds=Arrays.copyOf(state.enemyUnitIds, state.enemyUnitIds.length);
+         copy.enemyUnitXPositions=Arrays.copyOf(state.enemyUnitXPositions, state.enemyUnitXPositions.length);
+         copy.enemyUnitYPositions=Arrays.copyOf(state.enemyUnitYPositions, state.enemyUnitYPositions.length);
+         
+         copy.friendlyUnitIds=Arrays.copyOf(state.friendlyUnitIds, state.friendlyUnitIds.length);
+         copy.friendlyUnitXPositions=Arrays.copyOf(state.friendlyUnitXPositions, state.friendlyUnitXPositions.length);
+         copy.friendlyUnitYPositions=Arrays.copyOf(state.friendlyUnitYPositions, state.friendlyUnitYPositions.length);
+         return copy;
+    }
 }
