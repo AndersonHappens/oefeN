@@ -8,6 +8,7 @@ import edu.cwru.sepia.environment.model.state.State;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class MinimaxAlphaBeta extends Agent {
 
     private final int numPlys;
+    private boolean isMax = true;
 
     public MinimaxAlphaBeta(int playernum, String[] args)
     {
@@ -75,11 +77,55 @@ public class MinimaxAlphaBeta extends Agent {
      * @return The best child of this node with updated values
      */
     public GameStateChild alphaBetaSearch(GameStateChild node, int depth, double alpha, double beta)
-    {
+    { 
+    	List<GameStateChild> children = orderChildrenWithHeuristics(node.state.getChildren());
+    	if (depth == 0 || children.equals(null) || children.size() == 0) {
+            //return node; unnecessary, happens at end of method
+    	} else if (isMax()) {
+    		double v = Double.MIN_VALUE;
+    		  for(GameStateChild child: children) {
+    			  setMax(false);
+    			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
+	              v = Math.max(v, bestNode.state.getUtility());
+	              if (beta <= v) {
+	                  break; // alpha pruning
+	              }
+	              if(alpha < v) {
+	            	  alpha = v;
+	            	  node = bestNode;
+	              }
+
+    		  }
+    	} else {
+	          double v = Double.MAX_VALUE;
+	          for(GameStateChild child: children) {
+	        	  setMax(true);
+    			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
+	              v = Math.min(v, bestNode.state.getUtility());
+	              if (v <= alpha) {
+	                  break; // alpha pruning
+	              }
+	              if(beta > v) {
+	            	  beta = v;
+	            	  node = bestNode;
+	              }
+
+	          }
+    	}
         return node;
     }
 
-    /**
+    private void setMax(boolean b) {
+		isMax = b;		
+	}
+
+	private boolean isMax() {
+		return isMax;
+	}
+    
+
+
+	/**
      * You will implement this.
      *
      * Given a list of children you will order them according to heuristics you make up.
@@ -96,7 +142,7 @@ public class MinimaxAlphaBeta extends Agent {
     {
          ArrayList<GameStateChild> children2=new ArrayList<GameStateChild>();
          children2.addAll(children);
-         children2.sort(new GameStateComparator());
+         Collections.sort(children2, new GameStateComparator());
          return children2;
     }
     
