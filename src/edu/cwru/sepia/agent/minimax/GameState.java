@@ -8,6 +8,8 @@ import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 import edu.cwru.sepia.util.Direction;
+import edu.cwru.sepia.util.DistanceMetrics;
+import edu.cwru.sepia.util.Pair;
 
 import java.util.*;
 
@@ -123,7 +125,38 @@ public class GameState {
      * @return The weighted linear combination of the features
      */
     public double getUtility() {
-        return 0.0;
+    	double util= 0;
+    	Pair<Integer, Double> closestEnemy;
+		for(int j = 0; j< friendlyUnitXPositions.length; j++) {
+			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
+	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
+	    		if(closestEnemy.a == i) {
+	    			util += xSize*ySize/DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i]);
+	    		} else {
+	    			util -= xSize*ySize/DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i]);
+	    		}
+    		}
+    	}
+        return util;
+    }
+    /**
+     * 
+     * @param x
+     * @param y
+     * @return the index of the closest enemy in the array of enemy positions and the distance
+     */
+    private Pair<Integer, Double> getClosestEnemy(int x, int y) {
+    	int index = enemyUnitXPositions.length;
+    	double dist = Double.MAX_VALUE;
+    	int temp;
+    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
+    		temp =  DistanceMetrics.chebyshevDistance(x, y, enemyUnitXPositions[i], enemyUnitYPositions[i]);
+    		if( dist > temp) {
+    			dist = temp;
+    			index = i;
+    		}
+		}
+    	return new Pair<Integer, Double>(index, dist);
     }
 
     /**
