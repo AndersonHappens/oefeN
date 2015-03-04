@@ -16,6 +16,7 @@ import java.util.Map;
 public class MinimaxAlphaBeta extends Agent {
 
     private final int numPlys;
+    private boolean isMax = true;
 
     public MinimaxAlphaBeta(int playernum, String[] args)
     {
@@ -80,9 +81,10 @@ public class MinimaxAlphaBeta extends Agent {
     	List<GameStateChild> children = orderChildrenWithHeuristics(node.state.getChildren());
     	if (depth == 0 || children.equals(null) || children.size() == 0) {
             //return node; unnecessary, happens at end of method
-    	} else if (node.state.isHero()) {
+    	} else if (isMax()) {
     		double v = Double.MIN_VALUE;
     		  for(GameStateChild child: children) {
+    			  setMax(false);
     			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
 	              v = Math.max(v, bestNode.state.getUtility());
 	              if (beta <= v) {
@@ -97,6 +99,7 @@ public class MinimaxAlphaBeta extends Agent {
     	} else {
 	          double v = Double.MAX_VALUE;
 	          for(GameStateChild child: children) {
+	        	  setMax(true);
     			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
 	              v = Math.min(v, bestNode.state.getUtility());
 	              if (v <= alpha) {
@@ -112,7 +115,17 @@ public class MinimaxAlphaBeta extends Agent {
         return node;
     }
 
-    /**
+    private void setMax(boolean b) {
+		isMax = b;		
+	}
+
+	private boolean isMax() {
+		return isMax;
+	}
+    
+
+
+	/**
      * You will implement this.
      *
      * Given a list of children you will order them according to heuristics you make up.

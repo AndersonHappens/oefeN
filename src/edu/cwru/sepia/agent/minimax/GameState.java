@@ -86,8 +86,5 @@ public class GameState {
         return null;
     }
 
-	public boolean isHero() {
-		// TODO return whether or not the current unit is not the archer agent
-		return false;
-	}
+
 }
