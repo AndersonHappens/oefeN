@@ -20,6 +20,18 @@ import java.util.*;
  */
 public class GameState {
 
+     private int xSize;  //map size along x-axis
+     private int ySize;  //map size along y-axis
+     
+     private int[] obstaclesXPositions;
+     private int[] obstaclesYPositions;
+     
+     private int[] enemyUnitXPositions;
+     private int[] enemyUnitYPositions;
+     
+     private int[] friendlyUnitXPositions;
+     private int[] friendlyUnitYPositions;
+     
     /**
      * You will implement this constructor. It will
      * extract all of the needed state information from the built in
@@ -42,6 +54,18 @@ public class GameState {
      * @param state Current state of the episode
      */
     public GameState(State.StateView state) {
+         xSize=state.getXExtent();
+         ySize=state.getYExtent();
+         
+         Integer[] resourceIds=state.getAllResourceIds().toArray(new Integer[1]);
+         obstaclesXPositions=new int[resourceIds.length];
+         obstaclesYPositions=new int[resourceIds.length];
+         for(int i=0;i<resourceIds.length;i++) {
+              obstaclesXPositions[i]=state.getResourceNode(resourceIds[i]).getXPosition();
+              obstaclesYPositions[i]=state.getResourceNode(resourceIds[i]).getYPosition();
+         }
+         
+         
     }
 
     /**
