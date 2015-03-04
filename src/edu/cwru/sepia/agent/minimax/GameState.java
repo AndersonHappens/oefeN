@@ -6,6 +6,7 @@ import edu.cwru.sepia.action.DirectedAction;
 import edu.cwru.sepia.action.TargetedAction;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
+import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 import edu.cwru.sepia.util.Direction;
 
 import java.util.*;
@@ -19,6 +20,8 @@ import java.util.*;
  * but do not delete or change the signatures of the provided methods.
  */
 public class GameState {
+     
+     private static final Integer myPlayerNum=new Integer(0);
 
      private int xSize;  //map size along x-axis
      private int ySize;  //map size along y-axis
@@ -65,7 +68,40 @@ public class GameState {
               obstaclesYPositions[i]=state.getResourceNode(resourceIds[i]).getYPosition();
          }
          
+         List<UnitView> myUnits = state.getUnits(myPlayerNum);             // support for arbitrary amount of friendly units
+         friendlyUnitXPositions = new int[myUnits.size()];
+         friendlyUnitYPositions = new int[myUnits.size()];
+         for(int i=0;i<myUnits.size();i++) {
+              friendlyUnitXPositions[i]=myUnits.get(i).getXPosition();
+              friendlyUnitYPositions[i]=myUnits.get(i).getYPosition();
+         }
          
+         Integer[] players=state.getPlayerNumbers();                       //support for arbitrary amount of enemies and enemy units
+         ArrayList<Integer> enemies=new ArrayList<Integer>();
+         for(int i=0;i<players.length;i++) {
+              if(players[i].equals(myPlayerNum)) {
+                   enemies.add(players[i]);
+              }
+         }
+         List<UnitView> enemyUnits=null;
+         if(enemies.size()>0) {
+              enemyUnits = state.getUnits(enemies.get(0));
+              if(enemies.size()>1) {
+                   for(int i=1;i<enemies.size();i++) {
+                        enemyUnits.addAll(state.getUnits(enemies.get(i)));
+                   }
+              }
+         }
+         enemyUnitXPositions=new int[0];
+         enemyUnitYPositions=new int[0];
+         if(enemyUnits!=null) {
+              enemyUnitXPositions = new int[enemyUnits.size()];
+              enemyUnitXPositions = new int[enemyUnits.size()];
+              for(int i=0;i<enemyUnits.size();i++) {
+                   enemyUnitXPositions[i]=enemyUnits.get(i).getXPosition();
+                   enemyUnitXPositions[i]=enemyUnits.get(i).getYPosition();
+              }
+         }
     }
 
     /**
