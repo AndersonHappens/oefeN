@@ -25,8 +25,4 @@ public class GameStateChild {
         this.action = action;
         this.state = state;
     }
-    
-    public String toString() {
-         return state.toString();
-    }
 }
