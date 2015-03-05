@@ -284,7 +284,6 @@ public class GameState {
               }
          }
          for(int i=0;i<state.enemyUnitXPositions.length;i++) {
-              System.out.println(Arrays.toString(state.enemyUnitXPositions)+"  "+Arrays.toString(state.enemyUnitYPositions));
               if(xPos==state.enemyUnitXPositions[i] && yPos==state.enemyUnitYPositions[i]) {
                    return false;
               }
