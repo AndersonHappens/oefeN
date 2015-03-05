@@ -34,13 +34,13 @@ public class GameState {
      private int[] obstaclesYPositions;
      
      private Integer[] enemyUnitIds;
-     private int[] enemyUnitXPositions;
-     private int[] enemyUnitYPositions;
+     public int[] enemyUnitXPositions;
+     public int[] enemyUnitYPositions;
      private int[] enemyUnitRange;
      
      private Integer[] friendlyUnitIds;
-     private int[] friendlyUnitXPositions;
-     private int[] friendlyUnitYPositions;
+     public int[] friendlyUnitXPositions;
+     public int[] friendlyUnitYPositions;
      private int[] friendlyUnitRange;
      
     /**
@@ -201,6 +201,7 @@ public class GameState {
          GameState copy=copy(this);
          copy.myTurnNext=!this.myTurnNext;
          children.add(new GameStateChild(new HashMap<Integer, Action>(), copy));
+
          ArrayList<GameStateChild> newChildren = new ArrayList<GameStateChild>();
          if(myTurnNext) {
               //our turn

@@ -84,6 +84,7 @@ public class MinimaxAlphaBeta extends Agent {
     	} else if (isMax()) {
     		double v = Double.MIN_VALUE;
     		  for(GameStateChild child: children) {
+    			  
     			  setMax(false);
     			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
 	              v = Math.max(v, bestNode.state.getUtility());
