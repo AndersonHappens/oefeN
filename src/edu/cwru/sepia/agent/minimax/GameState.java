@@ -145,7 +145,7 @@ public class GameState {
      *
      * @return The weighted linear combination of the features
      */
-    public double getUtility() {
+    public double getUtility() { 
     	double util= 0;
     	Pair<Integer, Double> closestEnemy;
 		for(int j = 0; j< friendlyUnitXPositions.length; j++) {
