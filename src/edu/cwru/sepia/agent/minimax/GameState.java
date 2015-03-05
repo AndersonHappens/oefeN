@@ -112,11 +112,11 @@ public class GameState {
          enemyUnitRange=new int[0];
          if(enemyUnits!=null) {
               enemyUnitXPositions = new int[enemyUnits.size()];
-              enemyUnitXPositions = new int[enemyUnits.size()];
+              enemyUnitYPositions = new int[enemyUnits.size()];
               enemyUnitRange=new int[enemyUnits.size()];
               for(int i=0;i<enemyUnits.size();i++) {
                    enemyUnitXPositions[i]=enemyUnits.get(i).getXPosition();
-                   enemyUnitXPositions[i]=enemyUnits.get(i).getYPosition();
+                   enemyUnitYPositions[i]=enemyUnits.get(i).getYPosition();
                    enemyUnitRange[i]=enemyUnits.get(i).getTemplateView().getRange();
               }
          }
@@ -284,6 +284,7 @@ public class GameState {
               }
          }
          for(int i=0;i<state.enemyUnitXPositions.length;i++) {
+              System.out.println(Arrays.toString(state.enemyUnitXPositions)+"  "+Arrays.toString(state.enemyUnitYPositions));
               if(xPos==state.enemyUnitXPositions[i] && yPos==state.enemyUnitYPositions[i]) {
                    return false;
               }
