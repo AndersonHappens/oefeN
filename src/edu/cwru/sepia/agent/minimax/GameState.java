@@ -4,6 +4,8 @@ import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.action.DirectedAction;
 import edu.cwru.sepia.action.TargetedAction;
+//import edu.cwru.sepia.agent.AstarAgent.LocationComparator;
+//import edu.cwru.sepia.agent.AstarAgent.MapLocation;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
@@ -146,19 +148,14 @@ public class GameState {
      * @return The weighted linear combination of the features
      */
     public double getUtility() {
-    	double util= 0;
-    	Pair<Integer, Double> closestEnemy;
-		for(int j = 0; j< friendlyUnitXPositions.length; j++) {
-			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
- 	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
- 	    		if(closestEnemy.a == i) {
- 	    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
- 	    		} else {
- 	    			util -= xSize*ySize/100/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
- 	    		}
-     		}
-     	}
-        return util;
+         double util= 0;
+         Pair<Integer, Double> closestEnemy;
+         for(int j = 0; j< friendlyUnitXPositions.length; j++) {
+              closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
+              util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
+              //util+=100000*(ySize-friendlyUnitYPositions[j]);
+         }
+         return util;
     }
     /**
      * 

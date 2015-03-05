@@ -101,7 +101,7 @@ public class MinimaxAlphaBeta extends Agent {
     			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
 	              v = Math.min(v, bestNode.state.getUtility());
 	              if (v <= alpha) {
-	                  break; // alpha pruning
+	                  break; // beta pruning
 	              }
 	              if(beta > v) {
 	            	  beta = v;
