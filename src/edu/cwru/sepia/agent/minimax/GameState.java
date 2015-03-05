@@ -68,7 +68,7 @@ public class GameState {
          xSize=state.getXExtent();
          ySize=state.getYExtent();
          
-         Integer[] resourceIds=state.getAllResourceIds().toArray(new Integer[1]);
+         Integer[] resourceIds=state.getAllResourceIds() .toArray(new Integer[0]);
          obstaclesXPositions=new int[resourceIds.length];
          obstaclesYPositions=new int[resourceIds.length];
          for(int i=0;i<resourceIds.length;i++) {
