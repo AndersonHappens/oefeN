@@ -79,7 +79,7 @@ public class MinimaxAlphaBeta extends Agent {
     public GameStateChild alphaBetaSearch(GameStateChild node, int depth, double alpha, double beta)
     { 
     	List<GameStateChild> children = orderChildrenWithHeuristics(node.state.getChildren());
-    	if (depth == 0 || children.equals(null) || children.size() == 0) {
+    	if (depth == 0 || children==null || children.size() == 0) {
             //return node; unnecessary, happens at end of method
     	} else if (isMax()) {
     		double v = Double.MIN_VALUE;
@@ -140,6 +140,9 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public List<GameStateChild> orderChildrenWithHeuristics(List<GameStateChild> children)
     {
+         if(children==null) {
+              return null;
+         }
          ArrayList<GameStateChild> children2=new ArrayList<GameStateChild>();
          children2.addAll(children);
          Collections.sort(children2, new GameStateComparator());
