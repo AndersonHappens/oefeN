@@ -209,6 +209,7 @@ public class GameState {
                    while(!children.isEmpty()) {
                         GameStateChild current=children.remove(0);
                         Integer enemyToAttack=canAttack(i, true);
+                        System.out.println(friendlyUnitXPositions[i]+"  "+friendlyUnitYPositions[i]+"  "+canAttack(i,true));
                         if(enemyToAttack!=null) {
                              GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                              newChild.action.putAll(current.action);
@@ -283,11 +284,9 @@ public class GameState {
     }
     
     private static boolean isValidMove(GameState state, int xPos, int yPos) {
-         System.out.println(xPos+"  "+yPos);
          if(xPos<0 || xPos>=state.xSize || yPos<0 || yPos>=state.ySize) {
               return false;
          }
-         System.out.println("passed in bounds check");
          for(int i=0;i<state.obstaclesXPositions.length;i++) {
               if(xPos==state.obstaclesXPositions[i] && yPos==state.obstaclesYPositions[i]) {
                    return false;
@@ -306,7 +305,7 @@ public class GameState {
          return true;
     }
     
-    private Integer canAttack(int i, boolean whoseAttack) {      // whose attack true if my units attacking, false if enemy units attacking
+    private Integer canAttack(int i, boolean whoseAttack) {      // whoseAttack true if my units attacking, false if enemy units attacking
          if(whoseAttack) {                                       // i refers to the index of the unit in the arrays
               for(int j=0;j<enemyUnitIds.length;j++) {
                    if(Math.abs(enemyUnitXPositions[j]-friendlyUnitXPositions[i])+Math.abs(enemyUnitYPositions[j]-friendlyUnitYPositions[i])<friendlyUnitRange[i]) {
