@@ -24,9 +24,10 @@ import java.util.*;
  * but do not delete or change the signatures of the provided methods.
  */
 public class GameState {
-     
+     //The player number.  Change this if the player number is not 0.
      private static final Integer myPlayerNum=new Integer(0);
      
+     //keeps track of whose turn is next, to know whether to move the friendly units or the enemies when finding children
      public boolean myTurnNext;
 
      private int xSize;  //map size along x-axis
@@ -66,10 +67,14 @@ public class GameState {
      *
      * @param state Current state of the episode
      */
+     /* The constructor for the parent GameState.
+      * Extracts relevant information from the State.StateView
+      */
     public GameState(State.StateView state) {
          xSize=state.getXExtent();
          ySize=state.getYExtent();
          
+         //get resource (obstacle) locations
          Integer[] resourceIds=state.getAllResourceIds().toArray(new Integer[0]);
          obstaclesXPositions=new int[resourceIds.length];
          obstaclesYPositions=new int[resourceIds.length];
@@ -78,8 +83,11 @@ public class GameState {
               obstaclesYPositions[i]=state.getResourceNode(resourceIds[i]).getYPosition();
          }
          
+         // get the ids, locations, and ranges of the friendly units (assumption:playerNum=0)
+         // support for arbitrary amount of friendly units
+         // theoretically supports arbitrary friendly units (untested)
          friendlyUnitIds=state.getUnitIds(myPlayerNum).toArray(new Integer[0]);
-         List<UnitView> myUnits = state.getUnits(myPlayerNum);             // support for arbitrary amount of friendly units
+         List<UnitView> myUnits = state.getUnits(myPlayerNum);
          friendlyUnitXPositions = new int[myUnits.size()];
          friendlyUnitYPositions = new int[myUnits.size()];
          friendlyUnitRange = new int[myUnits.size()];
@@ -89,7 +97,10 @@ public class GameState {
               friendlyUnitRange[i]=myUnits.get(i).getTemplateView().getRange();
          }
          
-         Integer[] players=state.getPlayerNumbers();                       //support for arbitrary amount of enemies and enemy units
+         // get the ids, locations, and ranges of the enemy units (assumption:playerNum=0)
+         // support for arbitrary amount of enemies and enemy units
+         // theoretically supports arbitrary enemy units (untested)
+         Integer[] players=state.getPlayerNumbers();
          ArrayList<Integer> enemies=new ArrayList<Integer>();
          for(int i=0;i<players.length;i++) {
               if(!players[i].equals(myPlayerNum)) {
@@ -122,6 +133,7 @@ public class GameState {
                    enemyUnitRange[i]=enemyUnits.get(i).getTemplateView().getRange();
               }
          }
+         
          myTurnNext=true;
     }
 
@@ -148,14 +160,49 @@ public class GameState {
      * @return The weighted linear combination of the features
      */
     public double getUtility() {
-         double util= 0;
-         Pair<Integer, Double> closestEnemy;
-         for(int j = 0; j< friendlyUnitXPositions.length; j++) {
-              closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
-              util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
-              //util+=100000*(ySize-friendlyUnitYPositions[j]);
-         }
-         return util;
+    	double util= 0;
+    	Pair<Integer, Double> closestEnemy;
+		for(int j = 0; j< friendlyUnitXPositions.length; j++) {
+			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
+			if(canSeeEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])) {
+    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
+			} else {
+				util -= xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
+			}
+ 	    	if(closestEnemy.b <2 ) {
+ 	    		util +=10000;
+ 	    	}
+     	}
+        return util;
+    }
+    
+    private boolean canSeeEnemy(int herox, int heroy, int x, int y) {
+    	if(x < herox) {
+    		//swap
+    		int temp = x;
+    		x = herox;
+    		herox = temp;
+    		 
+    	}
+    	if(y< heroy) {
+    		//swap
+    		int temp = y;
+    		y = heroy;
+    		heroy = temp;
+    		 
+    	}
+    	for(int i = herox; i <= x; i++ ) {
+    		for(int j = heroy; j <= y; j++) {
+    			for(int ox: obstaclesXPositions) {
+    				for(int oy: obstaclesYPositions) {
+    					if(ox == i && oy == j) {
+    						return false;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return true;
     }
     /**
      * 
@@ -193,6 +240,7 @@ public class GameState {
      *
      * @return All possible actions and their associated resulting game state
      */
+    //This should work for arbitrary numbers and types of friendly and enemy units.
     public List<GameStateChild> getChildren() {
          ArrayList<GameStateChild> children = new ArrayList<GameStateChild>();
          GameState copy=copy(this);
@@ -200,18 +248,22 @@ public class GameState {
          children.add(new GameStateChild(new HashMap<Integer, Action>(), copy));
 
          ArrayList<GameStateChild> newChildren = new ArrayList<GameStateChild>();
-         if(myTurnNext) {
+         if(myTurnNext) {     //calculate children if our turn
               //our turn
               for(int i=0;i<friendlyUnitIds.length;i++) {
+                   // for each friendly unit, compute possible states from states already in children.
+                   // then add the resulting states back to children, and repeat for the next unit
                    while(!children.isEmpty()) {
                         GameStateChild current=children.remove(0);
                         Integer enemyToAttack=canAttack(i, true);
+                        // if a unit can attack an enemy, it does
                         if(enemyToAttack!=null) {
                              GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                              newChild.action.putAll(current.action);
                              newChild.action.put(new Integer(i),Action.createPrimitiveAttack(friendlyUnitIds[i], enemyToAttack));
                              newChildren.add(newChild);
                         } else {
+                             //otherwise, explore all legal moves
                              for(Direction direction: Direction.values()) {
                                   if((direction.xComponent()==0 || direction.yComponent()==0) && isValidMove(current.state,current.state.friendlyUnitXPositions[i]+direction.xComponent(),current.state.friendlyUnitYPositions[i]+direction.yComponent())) {
                                        GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
@@ -229,6 +281,7 @@ public class GameState {
               }
          } else {
               //their turn
+              //same as above, except the role of enemy and friendly units is reversed
               for(int i=0;i<enemyUnitIds.length;i++) {
                    while(!children.isEmpty()) {
                         GameStateChild current=children.remove(0);
@@ -257,7 +310,11 @@ public class GameState {
          }
          return children;
     }
-
+    
+    /*
+     * Creates a copy of a GameState for finding children.
+     * Specific values are later changed as needed (in getChildren)to reflect the new state.
+     */
     private static GameState copy(GameState state) {
          GameState copy=new GameState();
          copy.myTurnNext=state.myTurnNext;
@@ -279,20 +336,25 @@ public class GameState {
          return copy;
     }
     
+    //Checks whether a location is valid to move to
     private static boolean isValidMove(GameState state, int xPos, int yPos) {
+         // in bounds check
          if(xPos<0 || xPos>=state.xSize || yPos<0 || yPos>=state.ySize) {
               return false;
          }
+         // checks that there is no obstacle there
          for(int i=0;i<state.obstaclesXPositions.length;i++) {
               if(xPos==state.obstaclesXPositions[i] && yPos==state.obstaclesYPositions[i]) {
                    return false;
               }
          }
+         // checks that there is no enemy there
          for(int i=0;i<state.enemyUnitXPositions.length;i++) {
               if(xPos==state.enemyUnitXPositions[i] && yPos==state.enemyUnitYPositions[i]) {
                    return false;
               }
          }
+         // checks that there is no friendly unit there
          for(int i=0;i<state.friendlyUnitXPositions.length;i++) {
               if(xPos==state.friendlyUnitXPositions[i] && yPos==state.friendlyUnitYPositions[i]) {
                    return false;
@@ -301,6 +363,8 @@ public class GameState {
          return true;
     }
     
+    // checks whether there is a unit that the unit in the ith entry of the corresponding array can attack
+    // if so, returns that unit's id, otherwise, return null
     private Integer canAttack(int i, boolean whoseAttack) {      // whoseAttack true if my units attacking, false if enemy units attacking
          if(whoseAttack) {                                       // i refers to the index of the unit in the arrays
               for(int j=0;j<enemyUnitIds.length;j++) {
@@ -316,18 +380,5 @@ public class GameState {
               }
          }
          return null;
-    }
-    
-    public String toString() {
-         String s="";
-         s+="Friendlies at: ";
-         for(int i=0;i<friendlyUnitXPositions.length;i++) {
-              s+="("+friendlyUnitXPositions[i]+", "+friendlyUnitYPositions[i]+"), ";
-         }
-         s+="Enemies at: ";
-         for(int i=0;i<enemyUnitXPositions.length;i++) {
-              s+="("+enemyUnitXPositions[i]+", "+enemyUnitYPositions[i]+"), ";
-         }
-         return s;
     }
 }
