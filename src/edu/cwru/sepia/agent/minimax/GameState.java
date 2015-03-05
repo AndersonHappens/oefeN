@@ -68,7 +68,7 @@ public class GameState {
          xSize=state.getXExtent();
          ySize=state.getYExtent();
          
-         Integer[] resourceIds=state.getAllResourceIds().toArray(new Integer[1]);
+         Integer[] resourceIds=state.getAllResourceIds().toArray(new Integer[0]);
          obstaclesXPositions=new int[resourceIds.length];
          obstaclesYPositions=new int[resourceIds.length];
          for(int i=0;i<resourceIds.length;i++) {
@@ -80,6 +80,7 @@ public class GameState {
          List<UnitView> myUnits = state.getUnits(myPlayerNum);             // support for arbitrary amount of friendly units
          friendlyUnitXPositions = new int[myUnits.size()];
          friendlyUnitYPositions = new int[myUnits.size()];
+         friendlyUnitRange = new int[myUnits.size()];
          for(int i=0;i<myUnits.size();i++) {
               friendlyUnitXPositions[i]=myUnits.get(i).getXPosition();
               friendlyUnitYPositions[i]=myUnits.get(i).getYPosition();
@@ -108,9 +109,11 @@ public class GameState {
          enemyUnitIds=enemyIds.toArray(new Integer[0]);
          enemyUnitXPositions=new int[0];
          enemyUnitYPositions=new int[0];
+         enemyUnitRange=new int[0];
          if(enemyUnits!=null) {
               enemyUnitXPositions = new int[enemyUnits.size()];
               enemyUnitXPositions = new int[enemyUnits.size()];
+              enemyUnitRange=new int[enemyUnits.size()];
               for(int i=0;i<enemyUnits.size();i++) {
                    enemyUnitXPositions[i]=enemyUnits.get(i).getXPosition();
                    enemyUnitXPositions[i]=enemyUnits.get(i).getYPosition();
