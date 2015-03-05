@@ -120,7 +120,6 @@ public class GameState {
                    enemyUnitRange[i]=enemyUnits.get(i).getTemplateView().getRange();
               }
          }
-         
          myTurnNext=true;
     }
 
@@ -153,9 +152,10 @@ public class GameState {
 			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
 	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
 	    		if(closestEnemy.a == i) {
-	    			util += xSize*ySize/DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i]);
+	    		     System.out.println(friendlyUnitXPositions[j]+"  "+friendlyUnitYPositions[j]+"  "+enemyUnitXPositions[i]+"  "+enemyUnitYPositions[i]);
+	    			util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
 	    		} else {
-	    			util -= xSize*ySize/DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i]);
+	    			util -= xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
 	    		}
     		}
     	}
@@ -273,10 +273,12 @@ public class GameState {
          copy.enemyUnitIds=Arrays.copyOf(state.enemyUnitIds, state.enemyUnitIds.length);
          copy.enemyUnitXPositions=Arrays.copyOf(state.enemyUnitXPositions, state.enemyUnitXPositions.length);
          copy.enemyUnitYPositions=Arrays.copyOf(state.enemyUnitYPositions, state.enemyUnitYPositions.length);
+         copy.enemyUnitRange=Arrays.copyOf(state.enemyUnitRange,state.enemyUnitRange.length);
          
          copy.friendlyUnitIds=Arrays.copyOf(state.friendlyUnitIds, state.friendlyUnitIds.length);
          copy.friendlyUnitXPositions=Arrays.copyOf(state.friendlyUnitXPositions, state.friendlyUnitXPositions.length);
          copy.friendlyUnitYPositions=Arrays.copyOf(state.friendlyUnitYPositions, state.friendlyUnitYPositions.length);
+         copy.friendlyUnitRange=Arrays.copyOf(state.friendlyUnitRange,state.friendlyUnitRange.length);
          return copy;
     }
     
@@ -311,6 +313,7 @@ public class GameState {
               }
          } else {
               for(int j=0;j<friendlyUnitIds.length;j++) {
+                   System.out.println(Arrays.toString(enemyUnitRange));
                    if(Math.abs(enemyUnitXPositions[i]-friendlyUnitXPositions[j])+Math.abs(enemyUnitYPositions[i]-friendlyUnitYPositions[j])<enemyUnitRange[i]) {
                         return friendlyUnitIds[j];
                    }
