@@ -25,7 +25,7 @@ public class GameState {
      
      private static final Integer myPlayerNum=new Integer(0);
      
-     private boolean myTurnNext;
+     public boolean myTurnNext;
 
      private int xSize;  //map size along x-axis
      private int ySize;  //map size along y-axis
@@ -150,15 +150,15 @@ public class GameState {
     	Pair<Integer, Double> closestEnemy;
 		for(int j = 0; j< friendlyUnitXPositions.length; j++) {
 			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
-     	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
-     	    		if(closestEnemy.a == i) {
-     	    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
-     	    		} else {
-     	    			util -= xSize*ySize/100/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
-     	    		}
-         		}
-         	}
-        return -util;
+ 	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
+ 	    		if(closestEnemy.a == i) {
+ 	    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
+ 	    		} else {
+ 	    			util -= xSize*ySize/100/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
+ 	    		}
+     		}
+     	}
+        return util;
     }
     /**
      * 
@@ -216,7 +216,7 @@ public class GameState {
                              newChildren.add(newChild);
                         } else {
                              for(Direction direction: Direction.values()) {
-                                  if((direction.xComponent()==0 || direction.yComponent()==0) && isValidMove(current.state,current.state.friendlyUnitXPositions[i]+=direction.xComponent(),current.state.friendlyUnitXPositions[i]+=direction.yComponent())) {
+                                  if((direction.xComponent()==0 || direction.yComponent()==0) && isValidMove(current.state,current.state.friendlyUnitXPositions[i]+=direction.xComponent(),current.state.friendlyUnitYPositions[i]+=direction.yComponent())) {
                                        GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                                        newChild.action.putAll(current.action);
                                        newChild.action.put(new Integer(i),Action.createPrimitiveMove(friendlyUnitIds[i], direction));
