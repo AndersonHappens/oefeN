@@ -140,6 +140,7 @@ public class MinimaxAlphaBeta extends Agent {
      */
     public List<GameStateChild> orderChildrenWithHeuristics(List<GameStateChild> children)
     {
+         System.out.println(children);
          if(children==null) {
               return null;
          }

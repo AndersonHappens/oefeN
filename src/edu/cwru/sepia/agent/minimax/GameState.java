@@ -202,10 +202,12 @@ public class GameState {
          GameState copy=copy(this);
          copy.myTurnNext=!this.myTurnNext;
          children.add(new GameStateChild(new HashMap<Integer, Action>(), copy));
+         System.out.println(children);
          ArrayList<GameStateChild> newChildren = new ArrayList<GameStateChild>();
          if(myTurnNext) {
               //our turn
               for(int i=0;i<friendlyUnitIds.length;i++) {
+                   System.out.println(children+"  "+i);
                    while(!children.isEmpty()) {
                         GameStateChild current=children.remove(0);
                         for(Direction direction: Direction.values()) {
@@ -215,6 +217,7 @@ public class GameState {
                                   newChild.action.put(new Integer(i),Action.createPrimitiveMove(friendlyUnitIds[i], direction));
                                   newChild.state.friendlyUnitXPositions[i]+=direction.xComponent();
                                   newChild.state.friendlyUnitYPositions[i]+=direction.yComponent();
+                                  newChildren.add(newChild);
                              }
                         }
                         Integer enemyToAttack=canAttack(i, true);
@@ -222,6 +225,7 @@ public class GameState {
                              GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                              newChild.action.putAll(current.action);
                              newChild.action.put(new Integer(i),Action.createPrimitiveAttack(friendlyUnitIds[i], enemyToAttack));
+                             newChildren.add(newChild);
                         }
                    }
                    children=newChildren;
@@ -239,6 +243,7 @@ public class GameState {
                                   newChild.action.put(new Integer(i),Action.createPrimitiveMove(enemyUnitIds[i], direction));
                                   newChild.state.enemyUnitXPositions[i]+=direction.xComponent();
                                   newChild.state.enemyUnitYPositions[i]+=direction.yComponent();
+                                  newChildren.add(newChild);
                              }
                         }
                         Integer friendlyToAttack=canAttack(i, false);
@@ -246,13 +251,14 @@ public class GameState {
                              GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                              newChild.action.putAll(current.action);
                              newChild.action.put(new Integer(i),Action.createPrimitiveAttack(enemyUnitIds[i], friendlyToAttack));
+                             newChildren.add(newChild);
                         }
                    }
                    children=newChildren;
                    newChildren=new ArrayList<GameStateChild>();
               }
          }
-         return null;
+         return children;
     }
 
     private static GameState copy(GameState state) {
