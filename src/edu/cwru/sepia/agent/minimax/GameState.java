@@ -130,20 +130,9 @@ public class GameState {
 /**
      * You will implement this function.
      *
-     * You should use weighted linear combination of features.
-     * The features may be primitives from the state (such as hp of a unit)
-     * or they may be higher level summaries of information from the state such
-     * as distance to a specific location. Come up with whatever features you think
-     * are useful and weight them appropriately.
+     * 
      *
-     * It is recommended that you start simple until you have your algorithm working. Then watch
-     * your agent play and try to add features that correct mistakes it makes. However, remember that
-     * your features should be as fast as possible to compute. If the features are slow then you will be
-     * able to do less plys in a turn.
-     *
-     * Add a good comment about what is in your utility and why you chose those features.
-     *
-     * @return The weighted linear combination of the features
+     * @return The weighted linear combination of the features 
      */
     public double getUtility() {
     	double util= 0;
