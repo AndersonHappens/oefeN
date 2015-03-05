@@ -141,11 +141,15 @@ public class GameState {
      // for creating deep copies.
     }
 
-/**
-     * You will implement this function.
-     *
-     * 
-     *
+    /**
+     * Finds the utility of the current state.
+     * The utility is defined in the following manner:
+     * if you can see the enemy and no obstacles are blocking the path, add the inverse of the distance to the utility times a constant.
+     * that way, if there is a straight (or diagonal) line to the archer, you head straight for the archer.
+     * otherwise, subtract the inverse of the distance times the constant.
+     * that way, if you can't get to the archer, you try to get out of range of his arrows until you can.
+     * also, add 10000 to the utility of the function if the  footman gets within 2 of the archer.
+     * That way, hitting the archer is supremely favored (as the point of the game is to kill the archer).
      * @return The weighted linear combination of the features 
      */
     public double getUtility() {
@@ -164,7 +168,15 @@ public class GameState {
      	}
         return util;
     }
-    
+    /**
+     * iterates through every combination of x's and y's to see if there is an obstacle within the line of sight from the
+     * footman to the agent. returns false if something is blocking his way, otherwise, returns true.
+     * @param herox
+     * @param heroy
+     * @param x
+     * @param y
+     * @return
+     */
     private boolean canSeeEnemy(int herox, int heroy, int x, int y) {
     	if(x < herox) {
     		//swap
@@ -194,7 +206,7 @@ public class GameState {
     	return true;
     }
     /**
-     * 
+     * get's the closest enemy to a given position.
      * @param x
      * @param y
      * @return the index of the closest enemy in the array of enemy positions and the distance
