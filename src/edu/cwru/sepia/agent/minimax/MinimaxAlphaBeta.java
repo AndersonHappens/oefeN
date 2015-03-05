@@ -146,7 +146,7 @@ public class MinimaxAlphaBeta extends Agent {
          ArrayList<GameStateChild> children2=new ArrayList<GameStateChild>();
          children2.addAll(children);
          Collections.sort(children2, new GameStateComparator());
-         System.out.println(children2);
+         //System.out.println(children2);
          return children2;
     }
     
