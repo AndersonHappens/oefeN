@@ -152,10 +152,10 @@ public class GameState {
 			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
      	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
      	    		if(closestEnemy.a == i) {
-     	    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
-     	    		} else {
-     	    			util -= xSize*ySize/100/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
-     	    		}
+     	    		     util += 100-(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
+     	    		} //else {
+     	    			//util -= xSize*ySize/100/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
+     	    		//}
          		}
          	}
         return -util;
@@ -176,7 +176,7 @@ public class GameState {
     			dist = temp;
     			index = i;
     		}
-		}
+    	}
     	return new Pair<Integer, Double>(index, dist);
     }
 
@@ -215,7 +215,7 @@ public class GameState {
                              newChildren.add(newChild);
                         } else {
                              for(Direction direction: Direction.values()) {
-                                  if((direction.xComponent()==0 || direction.yComponent()==0) && isValidMove(current.state,current.state.friendlyUnitXPositions[i]+=direction.xComponent(),current.state.friendlyUnitXPositions[i]+=direction.yComponent())) {
+                                  if((direction.xComponent()==0 || direction.yComponent()==0) && isValidMove(current.state,current.state.friendlyUnitXPositions[i]+direction.xComponent(),current.state.friendlyUnitYPositions[i]+direction.yComponent())) {
                                        GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                                        newChild.action.putAll(current.action);
                                        newChild.action.put(new Integer(i),Action.createPrimitiveMove(friendlyUnitIds[i], direction));
@@ -242,7 +242,7 @@ public class GameState {
                              newChildren.add(newChild);
                         } else {
                              for(Direction direction: Direction.values()) {
-                                  if((direction.xComponent()==0 || direction.yComponent()==0) && isValidMove(current.state,current.state.enemyUnitXPositions[i]+=direction.xComponent(),current.state.enemyUnitXPositions[i]+=direction.yComponent())) {
+                                  if((direction.xComponent()==0 || direction.yComponent()==0) && isValidMove(current.state,current.state.enemyUnitXPositions[i]+direction.xComponent(),current.state.enemyUnitYPositions[i]+direction.yComponent())) {
                                        GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                                        newChild.action.putAll(current.action);
                                        newChild.action.put(new Integer(i),Action.createPrimitiveMove(enemyUnitIds[i], direction));
@@ -282,9 +282,11 @@ public class GameState {
     }
     
     private static boolean isValidMove(GameState state, int xPos, int yPos) {
+         System.out.println(xPos+"  "+yPos);
          if(xPos<0 || xPos>=state.xSize || yPos<0 || yPos>=state.ySize) {
               return false;
          }
+         System.out.println("passed in bounds check");
          for(int i=0;i<state.obstaclesXPositions.length;i++) {
               if(xPos==state.obstaclesXPositions[i] && yPos==state.obstaclesYPositions[i]) {
                    return false;
