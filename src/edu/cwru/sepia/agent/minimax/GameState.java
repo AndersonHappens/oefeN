@@ -153,9 +153,9 @@ public class GameState {
 			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
 	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
 	    		if(closestEnemy.a == i) {
-	    			util += xSize*ySize/DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i]);
+	    			util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
 	    		} else {
-	    			util -= xSize*ySize/DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i]);
+	    			util -= xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
 	    		}
     		}
     	}
