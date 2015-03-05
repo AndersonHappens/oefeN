@@ -16,7 +16,6 @@ import java.util.Map;
 public class MinimaxAlphaBeta extends Agent {
 
     private final int numPlys;
-    //private boolean isMax = true;
 
     public MinimaxAlphaBeta(int playernum, String[] args)
     {
@@ -85,7 +84,6 @@ public class MinimaxAlphaBeta extends Agent {
     		double v = Double.MIN_VALUE;
     		  for(GameStateChild child: children) {
     			  
-    			  //setMax(false);
     			  GameStateChild bestNode = alphaBetaSearch(child, depth - 1, alpha, beta);
 	              v = Math.max(v, bestNode.state.getUtility());
 	              if (beta <= v) {
@@ -114,16 +112,7 @@ public class MinimaxAlphaBeta extends Agent {
     	}
         return node;
     }
-/*
-    private void setMax(boolean b) {
-		isMax = b;		
-	}
 
-	private boolean isMax() {
-		return isMax;
-	}
-    
-*/
 
 	/**
      * You will implement this.
