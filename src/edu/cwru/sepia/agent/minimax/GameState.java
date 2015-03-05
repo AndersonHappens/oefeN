@@ -36,10 +36,12 @@ public class GameState {
      private Integer[] enemyUnitIds;
      private int[] enemyUnitXPositions;
      private int[] enemyUnitYPositions;
+     private int[] enemyUnitRange;
      
      private Integer[] friendlyUnitIds;
      private int[] friendlyUnitXPositions;
      private int[] friendlyUnitYPositions;
+     private int[] friendlyUnitRange;
      
     /**
      * You will implement this constructor. It will
@@ -81,6 +83,7 @@ public class GameState {
          for(int i=0;i<myUnits.size();i++) {
               friendlyUnitXPositions[i]=myUnits.get(i).getXPosition();
               friendlyUnitYPositions[i]=myUnits.get(i).getYPosition();
+              friendlyUnitRange[i]=myUnits.get(i).getTemplateView().getRange();
          }
          
          Integer[] players=state.getPlayerNumbers();                       //support for arbitrary amount of enemies and enemy units
@@ -111,6 +114,7 @@ public class GameState {
               for(int i=0;i<enemyUnits.size();i++) {
                    enemyUnitXPositions[i]=enemyUnits.get(i).getXPosition();
                    enemyUnitXPositions[i]=enemyUnits.get(i).getYPosition();
+                   enemyUnitRange[i]=enemyUnits.get(i).getTemplateView().getRange();
               }
          }
          
@@ -192,7 +196,9 @@ public class GameState {
      */
     public List<GameStateChild> getChildren() {
          ArrayList<GameStateChild> children = new ArrayList<GameStateChild>();
-         children.add(new GameStateChild(new HashMap<Integer, Action>(), this));
+         GameState copy=copy(this);
+         copy.myTurnNext=!this.myTurnNext;
+         children.add(new GameStateChild(new HashMap<Integer, Action>(), copy));
          ArrayList<GameStateChild> newChildren = new ArrayList<GameStateChild>();
          if(myTurnNext) {
               //our turn
@@ -200,12 +206,48 @@ public class GameState {
                    while(!children.isEmpty()) {
                         GameStateChild current=children.remove(0);
                         for(Direction direction: Direction.values()) {
-                             //newChildren.
+                             if(isValidMove(current.state,current.state.friendlyUnitXPositions[i]+=direction.xComponent(),current.state.friendlyUnitXPositions[i]+=direction.yComponent())) {
+                                  GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
+                                  newChild.action.putAll(current.action);
+                                  newChild.action.put(new Integer(i),Action.createPrimitiveMove(friendlyUnitIds[i], direction));
+                                  newChild.state.friendlyUnitXPositions[i]+=direction.xComponent();
+                                  newChild.state.friendlyUnitYPositions[i]+=direction.yComponent();
+                             }
+                        }
+                        Integer enemyToAttack=canAttack(i, true);
+                        if(enemyToAttack!=null) {
+                             GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
+                             newChild.action.putAll(current.action);
+                             newChild.action.put(new Integer(i),Action.createPrimitiveAttack(friendlyUnitIds[i], enemyToAttack));
                         }
                    }
+                   children=newChildren;
+                   newChildren=new ArrayList<GameStateChild>();
               }
          } else {
               //their turn
+              for(int i=0;i<enemyUnitIds.length;i++) {
+                   while(!children.isEmpty()) {
+                        GameStateChild current=children.remove(0);
+                        for(Direction direction: Direction.values()) {
+                             if(isValidMove(current.state,current.state.enemyUnitXPositions[i]+=direction.xComponent(),current.state.enemyUnitXPositions[i]+=direction.yComponent())) {
+                                  GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
+                                  newChild.action.putAll(current.action);
+                                  newChild.action.put(new Integer(i),Action.createPrimitiveMove(enemyUnitIds[i], direction));
+                                  newChild.state.enemyUnitXPositions[i]+=direction.xComponent();
+                                  newChild.state.enemyUnitYPositions[i]+=direction.yComponent();
+                             }
+                        }
+                        Integer friendlyToAttack=canAttack(i, false);
+                        if(friendlyToAttack!=null) {
+                             GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
+                             newChild.action.putAll(current.action);
+                             newChild.action.put(new Integer(i),Action.createPrimitiveAttack(enemyUnitIds[i], friendlyToAttack));
+                        }
+                   }
+                   children=newChildren;
+                   newChildren=new ArrayList<GameStateChild>();
+              }
          }
          return null;
     }
@@ -227,5 +269,44 @@ public class GameState {
          copy.friendlyUnitXPositions=Arrays.copyOf(state.friendlyUnitXPositions, state.friendlyUnitXPositions.length);
          copy.friendlyUnitYPositions=Arrays.copyOf(state.friendlyUnitYPositions, state.friendlyUnitYPositions.length);
          return copy;
+    }
+    
+    private static boolean isValidMove(GameState state, int xPos, int yPos) {
+         if(xPos<0 || xPos>=state.xSize || yPos<0 || yPos>=state.ySize) {
+              return false;
+         }
+         for(int i=0;i<state.obstaclesXPositions.length;i++) {
+              if(xPos==state.obstaclesXPositions[i] && yPos==state.obstaclesYPositions[i]) {
+                   return false;
+              }
+         }
+         for(int i=0;i<state.enemyUnitXPositions.length;i++) {
+              if(xPos==state.enemyUnitXPositions[i] && yPos==state.enemyUnitYPositions[i]) {
+                   return false;
+              }
+         }
+         for(int i=0;i<state.friendlyUnitXPositions.length;i++) {
+              if(xPos==state.friendlyUnitXPositions[i] && yPos==state.friendlyUnitYPositions[i]) {
+                   return false;
+              }
+         }
+         return true;
+    }
+    
+    private Integer canAttack(int i, boolean whoseAttack) {      // whose attack true if my units attacking, false if enemy units attacking
+         if(whoseAttack) {                                       // i refers to the index of the unit in the arrays
+              for(int j=0;j<enemyUnitIds.length;j++) {
+                   if(Math.abs(enemyUnitXPositions[j]-friendlyUnitXPositions[i])+Math.abs(enemyUnitYPositions[j]-friendlyUnitYPositions[i])<friendlyUnitRange[i]) {
+                        return enemyUnitIds[j];
+                   }
+              }
+         } else {
+              for(int j=0;j<friendlyUnitIds.length;j++) {
+                   if(Math.abs(enemyUnitXPositions[i]-friendlyUnitXPositions[j])+Math.abs(enemyUnitYPositions[i]-friendlyUnitYPositions[j])<enemyUnitRange[i]) {
+                        return friendlyUnitIds[j];
+                   }
+              }
+         }
+         return null;
     }
 }
