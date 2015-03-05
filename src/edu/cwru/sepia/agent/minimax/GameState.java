@@ -209,7 +209,6 @@ public class GameState {
                    while(!children.isEmpty()) {
                         GameStateChild current=children.remove(0);
                         Integer enemyToAttack=canAttack(i, true);
-                        System.out.println(friendlyUnitXPositions[i]+"  "+friendlyUnitYPositions[i]+"  "+canAttack(i,true));
                         if(enemyToAttack!=null) {
                              GameStateChild newChild=new GameStateChild(new HashMap<Integer,Action>(),GameState.copy(current.state));
                              newChild.action.putAll(current.action);
@@ -308,13 +307,13 @@ public class GameState {
     private Integer canAttack(int i, boolean whoseAttack) {      // whoseAttack true if my units attacking, false if enemy units attacking
          if(whoseAttack) {                                       // i refers to the index of the unit in the arrays
               for(int j=0;j<enemyUnitIds.length;j++) {
-                   if(Math.abs(enemyUnitXPositions[j]-friendlyUnitXPositions[i])+Math.abs(enemyUnitYPositions[j]-friendlyUnitYPositions[i])<friendlyUnitRange[i]) {
+                   if(Math.abs(enemyUnitXPositions[j]-friendlyUnitXPositions[i])+Math.abs(enemyUnitYPositions[j]-friendlyUnitYPositions[i])<=friendlyUnitRange[i]) {
                         return enemyUnitIds[j];
                    }
               }
          } else {
               for(int j=0;j<friendlyUnitIds.length;j++) {
-                   if(Math.abs(enemyUnitXPositions[i]-friendlyUnitXPositions[j])+Math.abs(enemyUnitYPositions[i]-friendlyUnitYPositions[j])<enemyUnitRange[i]) {
+                   if(Math.abs(enemyUnitXPositions[i]-friendlyUnitXPositions[j])+Math.abs(enemyUnitYPositions[i]-friendlyUnitYPositions[j])<=enemyUnitRange[i]) {
                         return friendlyUnitIds[j];
                    }
               }
