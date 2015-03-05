@@ -90,7 +90,7 @@ public class GameState {
          Integer[] players=state.getPlayerNumbers();                       //support for arbitrary amount of enemies and enemy units
          ArrayList<Integer> enemies=new ArrayList<Integer>();
          for(int i=0;i<players.length;i++) {
-              if(players[i].equals(myPlayerNum)) {
+              if(!players[i].equals(myPlayerNum)) {
                    enemies.add(players[i]);
               }
          }
@@ -145,15 +145,14 @@ public class GameState {
      *
      * @return The weighted linear combination of the features
      */
-    public double getUtility() { 
+    public double getUtility() {
     	double util= 0;
     	Pair<Integer, Double> closestEnemy;
 		for(int j = 0; j< friendlyUnitXPositions.length; j++) {
 			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
 	    	for(int i = 0; i< enemyUnitXPositions.length; i++) {
 	    		if(closestEnemy.a == i) {
-	    		     System.out.println(friendlyUnitXPositions[j]+"  "+friendlyUnitYPositions[j]+"  "+enemyUnitXPositions[i]+"  "+enemyUnitYPositions[i]);
-	    			util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
+	    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
 	    		} else {
 	    			util -= xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[i], enemyUnitYPositions[i])+1);
 	    		}
@@ -202,12 +201,10 @@ public class GameState {
          GameState copy=copy(this);
          copy.myTurnNext=!this.myTurnNext;
          children.add(new GameStateChild(new HashMap<Integer, Action>(), copy));
-         System.out.println(children);
          ArrayList<GameStateChild> newChildren = new ArrayList<GameStateChild>();
          if(myTurnNext) {
               //our turn
               for(int i=0;i<friendlyUnitIds.length;i++) {
-                   System.out.println(children+"  "+i);
                    while(!children.isEmpty()) {
                         GameStateChild current=children.remove(0);
                         for(Direction direction: Direction.values()) {
@@ -313,7 +310,6 @@ public class GameState {
               }
          } else {
               for(int j=0;j<friendlyUnitIds.length;j++) {
-                   System.out.println(Arrays.toString(enemyUnitRange));
                    if(Math.abs(enemyUnitXPositions[i]-friendlyUnitXPositions[j])+Math.abs(enemyUnitYPositions[i]-friendlyUnitYPositions[j])<enemyUnitRange[i]) {
                         return friendlyUnitIds[j];
                    }
