@@ -22,6 +22,9 @@ import java.util.*;
  *
  * Add any information or methods you would like to this class,
  * but do not delete or change the signatures of the provided methods.
+ * 
+ * @author: Jake Anderson
+ * @author: Joseph Tate 
  */
 public class GameState {
      //The player number.  Change this if the player number is not 0.

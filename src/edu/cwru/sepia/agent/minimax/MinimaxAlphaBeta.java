@@ -13,6 +13,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+* @author: Jake Anderson
+* @author: Joseph Tate 
+*/
 public class MinimaxAlphaBeta extends Agent {
 
     private final int numPlys;
