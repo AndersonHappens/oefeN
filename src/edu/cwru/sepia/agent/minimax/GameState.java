@@ -156,15 +156,17 @@ public class GameState {
     	double util= 0;
     	Pair<Integer, Double> closestEnemy;
 		for(int j = 0; j< friendlyUnitXPositions.length; j++) {
-			closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
-			if(canSeeEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])) {
-    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
-			} else {
-				util -= xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
+			if(enemyUnitXPositions != null && enemyUnitXPositions.length > 0) {
+				closestEnemy = getClosestEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j]);
+				if(canSeeEnemy(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])) {
+	    		     util += xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
+				} else {
+					util -= xSize*ySize/(DistanceMetrics.chebyshevDistance(friendlyUnitXPositions[j], friendlyUnitYPositions[j], enemyUnitXPositions[closestEnemy.a], enemyUnitYPositions[closestEnemy.a])+1);
+				}
+	 	    	if(closestEnemy.b <2 ) {
+	 	    		util +=10000;
+	 	    	}
 			}
- 	    	if(closestEnemy.b <2 ) {
- 	    		util +=10000;
- 	    	}
      	}
         return util;
     }
